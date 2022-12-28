@@ -39,18 +39,39 @@ document.querySelector('.btn-roll').addEventListener('click', function () {
       // 1 буусан тул тоглогчийн оноог устгах.
       // Хэрэв идэвхтэй тоглогч нь 0 байвал идэвхтэй тоглогчийн 1 болгох.
       // Үгүй бол идэвхтэй тоглогчийг 0 болгох.
-
-      // Тоглогчийн ээлжийн оноог 0 болгох.
-      roundScore = 0;
-      document.getElementById('current-' + activePlayer).textContent = 0;
-
-      // Тоглогчийн ээлжийг солих
-      activePlayer === 0 ? activePlayer = 1 : activePlayer = 0;
-
-      // Идэвхтэй тоглогчийн Улаан цэгийг нэмэх
-      document.querySelector('.player-0-panel').classList.toggle('active');
-      document.querySelector('.player-1-panel').classList.toggle('active');
-      diceDom.style.display = 'none';
-
+      switchToNextPlayer();
    }
 });
+
+// Hold товчлуурын эвент листенер 
+document.querySelector('.btn-hold').addEventListener('click', function () {
+   // Уг тоглогчийн цуглуулсан ээлжийн оноог глобаль оноо дээр нэмэж өгөх.
+   scores[activePlayer] = scores[activePlayer] + roundScore;
+
+   // Дэлгэц дээрх оноог нь өөрчилнө.
+   document.getElementById('score-' + activePlayer).textContent = scores[activePlayer];
+
+   // Уг тоглогчийг хожсон эсэхийг шалгах (оноо 100)
+   if (scores[activePlayer] >= 20) {
+      document.getElementById('name-' + activePlayer).textContent = 'WINNER!';
+      document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
+      document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active');
+   } else {
+      switchToNextPlayer();
+   }
+});
+
+// Дараагийн тоглогчруу шилжүүлэх
+function switchToNextPlayer() {
+   // Ээлжийн оноог 0 болгох.
+   roundScore = 0;
+   document.getElementById('current-' + activePlayer).textContent = 0;
+
+   // Тоглогчийн ээлжийг солих.
+   activePlayer === 0 ? activePlayer = 1 : activePlayer = 0;
+
+   // Идэвхтэй тоглогчийн Улаан цэгийг нэмэх
+   document.querySelector('.player-0-panel').classList.toggle('active');
+   document.querySelector('.player-1-panel').classList.toggle('active');
+   diceDom.style.display = 'none';
+}
