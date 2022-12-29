@@ -2,6 +2,8 @@
 var activePlayer;
 var scores;
 var roundScore;
+// Тоглоом дууссан эсэхийг хадгалах төлөвийн хувьсагч
+var isNewGame;
 
 // Шооны зургийг үзүүлэх элементийг DOM-д хадгалах
 var diceDom = document.querySelector('.dice');
@@ -10,6 +12,9 @@ initGame();
 
 // Тоглоомыг шинээр эхлэхэд бэлтгэнэ
 function initGame() {
+   // Тоглоом эхэллээ гэдэг төлөвт оруулна.
+   isNewGame = true;
+
    // Тоглогчийн ээлжийг хадгалах хувьсагч
    // Нэгдүгээр тоглогчийг 0, хоёрдугаар тоглогч 1 гэж тэмдэглэгдэнэ
    activePlayer = 0;
@@ -41,42 +46,55 @@ function initGame() {
 
 // Шоог шидэх эвент листенер
 document.querySelector('.btn-roll').addEventListener('click', function () {
-   // 1-6 санамсаргүй нэг тоо гаргаж авна
-   var diceNumber = Math.floor(Math.random() * 6) + 1;
+   if (isNewGame) {
+      // 1-6 санамсаргүй нэг тоо гаргаж авна
+      var diceNumber = Math.floor(Math.random() * 6) + 1;
 
-   // Шооны зургийг харагдуулдаг болгон шооны зургийг өөрчлөх
-   diceDom.style.display = 'block';
-   diceDom.src = 'dice-' + diceNumber + '.png';
+      // Шооны зургийг харагдуулдаг болгон шооны зургийг өөрчлөх
+      diceDom.style.display = 'block';
+      diceDom.src = 'dice-' + diceNumber + '.png';
 
-   // Шоо 1 с бусад тохиолдолд Тоглогчийн ээлжийн тоог Нэмэгдүүлэх. 
-   if (diceNumber !== 1) {
-      // 1-с ялгаатай тоо буулаа. Оноог нэмэгдүүэлэх.
-      roundScore = roundScore + diceNumber;
-      document.getElementById('current-' + activePlayer).textContent = roundScore;
+      // Шоо 1 с бусад тохиолдолд Тоглогчийн ээлжийн тоог Нэмэгдүүлэх. 
+      if (diceNumber !== 1) {
+         // 1-с ялгаатай тоо буулаа. Оноог нэмэгдүүэлэх.
+         roundScore = roundScore + diceNumber;
+         document.getElementById('current-' + activePlayer).textContent = roundScore;
+      } else {
+         // 1 буусан тул тоглогчийн оноог устгах.
+         // Хэрэв идэвхтэй тоглогч нь 0 байвал идэвхтэй тоглогчийн 1 болгох.
+         // Үгүй бол идэвхтэй тоглогчийг 0 болгох.
+         switchToNextPlayer();
+      }
    } else {
-      // 1 буусан тул тоглогчийн оноог устгах.
-      // Хэрэв идэвхтэй тоглогч нь 0 байвал идэвхтэй тоглогчийн 1 болгох.
-      // Үгүй бол идэвхтэй тоглогчийг 0 болгох.
-      switchToNextPlayer();
+      alert("Тоглоом дууссан байна. New Game товчийг дарж шинээр эхлэнэ үү.")
    }
 });
 
 // Hold товчлуурын эвент листенер 
 document.querySelector('.btn-hold').addEventListener('click', function () {
-   // Уг тоглогчийн цуглуулсан ээлжийн оноог глобаль оноо дээр нэмэж өгөх.
-   scores[activePlayer] = scores[activePlayer] + roundScore;
+   if (isNewGame) {
+      // Уг тоглогчийн цуглуулсан ээлжийн оноог глобаль оноо дээр нэмэж өгөх.
+      scores[activePlayer] = scores[activePlayer] + roundScore;
 
-   // Дэлгэц дээрх оноог нь өөрчилнө.
-   document.getElementById('score-' + activePlayer).textContent = scores[activePlayer];
+      // Дэлгэц дээрх оноог нь өөрчилнө.
+      document.getElementById('score-' + activePlayer).textContent = scores[activePlayer];
 
-   // Уг тоглогчийг хожсон эсэхийг шалгах (оноо 100)
-   if (scores[activePlayer] >= 20) {
-      document.getElementById('name-' + activePlayer).textContent = 'WINNER!';
-      document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
-      document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active');
+      // Уг тоглогчийг хожсон эсэхийг шалгах (оноо 100)
+      if (scores[activePlayer] >= 20) {
+         // Тоглоомыг дууссан төлөвт оруулна.
+         isNewGame = false;
+
+         document.getElementById('name-' + activePlayer).textContent = 'WINNER!';
+         document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
+         document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active');
+         document.getElementById('current-' + activePlayer).textContent = 0;
+      } else {
+         switchToNextPlayer();
+      }
    } else {
-      switchToNextPlayer();
+      alert("Тоглоом дууссан байна. New Game товчийг дарж шинээр эхлэнэ үү.")
    }
+
 });
 
 // Дараагийн тоглогчруу шилжүүлэх
